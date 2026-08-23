@@ -348,6 +348,22 @@ describe('checkout', () => {
     `)
   })
 
+  it('checkout filepaths stop at a path component boundary', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-checkout')
+    // 'src/model' is not a path in the tree. 'src/models' is, and it must not
+    // be dragged in just because its name starts the same way.
+    await checkout({
+      fs,
+      dir,
+      gitdir,
+      ref: 'test-branch',
+      filepaths: ['src/model'],
+    })
+    const index = await listFiles({ fs, dir, gitdir })
+    expect(index).toEqual([])
+  })
+
   it('checkout files using filepaths', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-checkout')

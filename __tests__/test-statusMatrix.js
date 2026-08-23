@@ -295,6 +295,23 @@ describe('statusMatrix', () => {
     ])
   })
 
+  it('statusMatrix with filepaths stops at a path component boundary', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
+    // Siblings whose names start with the requested path, but which are
+    // neither the path itself nor anything under it.
+    await fs.write(path.join(dir, 'index.js'), 'sibling file')
+    await fs.mkdir(path.join(dir, 'i2'))
+    await fs.write(path.join(dir, 'i2', 'i2.txt'), 'sibling directory')
+
+    // Test
+    const matrix = await statusMatrix({ fs, dir, gitdir, filepaths: ['i'] })
+    expect(matrix).toEqual([
+      ['i/.gitignore', 0, 2, 0],
+      ['i/i.txt', 0, 2, 0],
+    ])
+  })
+
   it('statusMatrix with filter', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
