@@ -312,6 +312,22 @@ describe('statusMatrix', () => {
     ])
   })
 
+  it('statusMatrix with a trailing slash on the filepath', async () => {
+    // Setup
+    const { fs, dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
+
+    // Test
+    expect(await statusMatrix({ fs, dir, gitdir, filepaths: ['i/'] })).toEqual([
+      ['i/.gitignore', 0, 2, 0],
+      ['i/i.txt', 0, 2, 0],
+    ])
+
+    // './' names the repository root, the same as '.'
+    expect(await statusMatrix({ fs, dir, gitdir, filepaths: ['./'] })).toEqual(
+      await statusMatrix({ fs, dir, gitdir, filepaths: ['.'] })
+    )
+  })
+
   it('statusMatrix with filter', async () => {
     // Setup
     const { fs, dir, gitdir } = await makeFixture('test-statusMatrix-filepath')
